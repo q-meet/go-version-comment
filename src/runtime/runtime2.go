@@ -985,17 +985,25 @@ func extendRandom(r []byte, n int) {
 // initialize them are not required. All defers must be manually scanned,
 // and for heap defers, marked.
 type _defer struct {
+	// 参数和返回值共占多少字节
 	siz     int32 // includes both arguments and results
+	// 是否已经执行
 	started bool
+	// 是否堆分配
 	heap    bool
 	// openDefer indicates that this _defer is for a frame with open-coded
 	// defers. We have only one defer record for the entire frame (which may
 	// currently have 0, 1, or more defers active).
+	// 是否会侵入代码 使用defer
 	openDefer bool
+	// 调用者栈指针
 	sp        uintptr  // sp at time of defer
+	// 返回地址
 	pc        uintptr  // pc at time of defer
+	// 注册的函数
 	fn        *funcval // can be nil for open-coded defers
 	_panic    *_panic  // panic that is running defer
+	// 下一个defer
 	link      *_defer
 
 	// If openDefer is true, the fields below record values about the stack
@@ -1020,12 +1028,19 @@ type _defer struct {
 // _panic values only live on the stack, regular stack pointer
 // adjustment takes care of them.
 type _panic struct {
+	// panic参数空间地址
 	argp      unsafe.Pointer // pointer to arguments of deferred call run during panic; cannot move - known to liblink
+	// panic 的参数
 	arg       interface{}    // argument to panic
+	// 链接到之前的panic
 	link      *_panic        // link to earlier panic
+	// pc 地址
 	pc        uintptr        // where to return to in runtime if this panic is bypassed
+	// sp 地址
 	sp        unsafe.Pointer // where to return to in runtime if this panic is bypassed
+	// 是否被恢复
 	recovered bool           // whether this panic is over
+	// panic 是否被终止
 	aborted   bool           // the panic was aborted
 	goexit    bool
 }
